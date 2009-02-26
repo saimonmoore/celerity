@@ -1,0 +1,126 @@
+<html>
+  <head>
+    <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+    <title>Custom Event Test</title>
+    <script type="text/javascript" charset="utf-8" src="mootools-1.2-core.js"></script>
+    <script type="text/javascript" charset="utf-8">
+    Element.Events.extend({
+     clickonce: {
+       base: 'click',
+       condition: function(event){
+         $clear(this.clickDelay);
+         this.clickDelay = this.fireEvent.delay(250, this, ['clickonce', event]);
+         return false;
+       }
+     },
+    
+     clicktwice: {
+       base: 'dblclick',
+       condition: function(){
+         $clear(this.clickDelay);
+         return true;
+       }
+     }
+    });
+    
+    var log = function(msg) {
+      var li = new Element('li', {'class': 'log', 'text': msg});
+      li.inject($('log'), 'bottom');
+    };
+    var CustomEventTest = {
+      init: function(){
+        log('inited');
+        $$('a.clickable').each(function(link) {
+          link.addEvents({
+            'click': function(e) {
+              log('click link: ' + e.target.id);            
+              e.stop();
+              return false;
+            },
+            'clickonce': function(e) {
+              log('click once link: ' + e.target.id);
+              e.stop();
+              return false;            
+            },
+            'clicktwice': function(e) {
+              log('click twice link: ' + e.target.id);
+              e.stop();
+              return false;            
+            },
+            'dblclick': function(e) {
+              log('dblclick link: ' + e.target.id);
+              e.stop();
+              return false;            
+            }
+          })
+        });
+        
+        $('link4').addEvent('click', function(e) {
+            log('click link: ' + e.target.id);            
+            e.stop();
+            return false;
+        });
+        
+        $('link4').addEvent('dblclick', function(e) {
+            log('dblclick link: ' + e.target.id);            
+            e.stop();
+            return false;
+        });
+        
+        $('list2').addEvents({
+          'click': function(e) {
+            e.stop();
+            if ($(e.target.id).hasClass('delegate')) {
+              log('click link: ' + e.target.id);
+              return false;
+            };
+            
+            return true;            
+          },
+          'clickonce': function(e) {
+            e.stop();
+            if ($(e.target.id).hasClass('delegate')) {
+              log('click once link: ' + e.target.id);
+              return false;
+            };
+            
+            return true;
+          },
+          'clicktwice': function(e) {
+            if ($(e.target.id).hasClass('delegate')) {
+              log('click twice link: ' + e.target.id);                          
+              return false;                          
+            };
+          },
+          'dblclick': function(e) {
+            e.stop();
+            if ($(e.target.id).hasClass('delegate')) {
+              log('dblclick link: ' + e.target.id);                          
+              return false;                          
+            };
+            return true;              
+          }
+        });                
+      }
+    };
+    
+    window.addEvents({
+      domready: CustomEventTest.init
+    });
+    </script>
+  </head>
+  <body>
+    <ul id="list1">
+      <li><a class="clickable" id="link1" href="custom_events.html">Click 1</a></li>
+      <li><a class="clickable" id="link2" href="custom_events.html">Click 2</a></li>
+    </ul>
+    <a id="link3" href="custom_events.html" onclick="log('click link: link3');return false;" >Click 3</a>
+    <a id="link4" href="custom_events.html" >Click 4</a>
+    
+    <ul id="list2">
+      <li><a class="delegate" id="link5" href="custom_events.html">Click 5</a></li>
+      <li><a class="delegate" id="link6" href="custom_events.html">Click 6</a></li>
+    </ul>
+    <ul id="log"></ul>
+  </body>
+</html>
